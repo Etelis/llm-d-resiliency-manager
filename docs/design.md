@@ -24,7 +24,8 @@ An operation proceeds as follows:
 4. Send `scale_down` concurrently to every survivor with the same request ID.
 5. Require consecutive healthy status and successful completion checks on every
    survivor. An HTTP 202 from recovery is only acceptance.
-6. Publish the survivor allowlist and wait for routing acknowledgement.
+6. Recheck survivor progress, publish their allowlist, and wait for routing
+   acknowledgement. Persisted verification does not replace this final check.
 
 The group then remains degraded. A subsequent survivor failure causes quarantine;
 there is no second removal, automatic `retry`, master relocation, or rejoin.

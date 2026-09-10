@@ -253,6 +253,24 @@ func TestAdmissionTimeoutPublishesNewQuarantine(t *testing.T) {
 	}
 }
 
+func TestAdmissionRechecksInferenceAfterInterruption(t *testing.T) {
+	f := newFixture(t)
+	f.suspect(t)
+	f.step(t, Recovering)
+	for rank := range f.observations {
+		f.observations[rank] = Observation{Status: "healthy"}
+	}
+	f.step(t, Recovering)
+	f.step(t, Publishing)
+	f.verifyErr = errors.New("worker stalled since the last verification")
+	f.step(t, Blocked)
+	for _, update := range f.updates {
+		if len(update.Allowed) != 0 {
+			t.Fatal("persisted verification was trusted without a fresh inference check")
+		}
+	}
+}
+
 func TestMembershipChangesNeverReplayOldOperation(t *testing.T) {
 	for _, change := range []string{"missing pod", "partial replacement", "container restart"} {
 		t.Run(change, func(t *testing.T) {

@@ -149,6 +149,9 @@ func (c *Controller) Reconcile(ctx context.Context) (*State, error) {
 		if !allHealthy(c.observe(ctx, snapshot.Members, state.Operation.Removed), state.Operation.Removed) {
 			return c.block(ctx, state, "survivor health changed before routing admission")
 		}
+		if err := c.parallel(ctx, state, c.Engine.Verify); err != nil {
+			return c.block(ctx, state, "survivor inference failed before routing admission")
+		}
 		ack, err := c.publish(ctx, state, 2, true)
 		if err != nil || !ack {
 			return state, err

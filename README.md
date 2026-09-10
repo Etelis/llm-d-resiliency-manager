@@ -3,8 +3,7 @@
 A controller for coordinating recovery of an expert-parallel inference group.
 
 The experimental vLLM FT path can exclude a failed rank and resume on the survivors.
-Something outside the
-engine still has to decide when to do that, send the same recovery operation to
+Something outside the engine still has to decide when to do that, send the same recovery operation to
 every survivor, and keep routing away from the excluded rank. This project owns
 that coordination.
 
