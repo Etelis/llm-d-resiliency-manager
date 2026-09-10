@@ -1,0 +1,17 @@
+group: model-0
+namespace: llm-d
+podSelector: leaderworkerset.sigs.k8s.io/name=model,leaderworkerset.sigs.k8s.io/group-index=0
+container: vllm
+expectedRanks: 4
+ranksPerPod: 2
+basePort: 8000
+enableRecovery: false
+pollInterval: 2s
+requestTimeout: 10s
+recoveryTimeout: 120s
+confirmations: 2
+verificationChecks: 3
+
+# Required when recovery is enabled. See docs/routing.md before setting routingURL.
+model: deepseek-ai/DeepSeek-V2-Lite
+routingURL: ""

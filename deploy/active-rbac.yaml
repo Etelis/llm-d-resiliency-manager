@@ -1,0 +1,29 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: resiliency-manager-recovery
+rules:
+  - apiGroups: ["", coordination.k8s.io]
+    resources: [configmaps, leases]
+    verbs: [create]
+  - apiGroups: [""]
+    resources: [configmaps]
+    resourceNames: [resiliency-model-0]
+    verbs: [get, update]
+  - apiGroups: [coordination.k8s.io]
+    resources: [leases]
+    resourceNames: [resiliency-model-0]
+    verbs: [get, update]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: resiliency-manager-recovery
+subjects:
+  - kind: ServiceAccount
+    name: resiliency-manager
+    namespace: llm-d
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: resiliency-manager-recovery

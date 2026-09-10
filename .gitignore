@@ -1,0 +1,5 @@
+/bin/
+/config.local.yaml
+*.test
+coverage.out
+.DS_Store

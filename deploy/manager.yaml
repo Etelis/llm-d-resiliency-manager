@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: resiliency-manager
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: resiliency-manager
+  template:
+    metadata:
+      labels:
+        app: resiliency-manager
+    spec:
+      serviceAccountName: resiliency-manager
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: manager
+          image: llm-d-resiliency-manager:dev
+          args: [--config=/etc/manager/config.yaml]
+          env:
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          ports:
+            - name: health
+              containerPort: 8081
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: health
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              memory: 256Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: [ALL]
+          volumeMounts:
+            - name: config
+              mountPath: /etc/manager
+              readOnly: true
+      volumes:
+        - name: config
+          configMap:
+            name: resiliency-manager-config
